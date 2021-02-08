@@ -52,6 +52,7 @@ coverage.xml
 
 # Django stuff:
 *.log
+local_settings.py
 
 # Flask stuff:
 instance/
@@ -100,3 +101,5 @@ ENV/
 .mypy_cache/
 
 .vagrant
+.vscode/settings.json
+

@@ -16,7 +16,7 @@
             <b-navbar-brand tag="h1">Decide</b-navbar-brand>
                 <b-navbar-nav class="ml-auto" v-if="!signup">
                     <b-nav-item href="#" v-on:click="decideLogout">
-                        {% trans "logout" %}
+                        {% trans "Logout" %}
                     </b-nav-item>
                 </b-navbar-nav>
         </b-navbar>
@@ -51,7 +51,7 @@
 
             <!-- Voting -->
             <div v-if="!signup">
-                <h2>[[ voting.question.desc ]]</h2>
+                <h2>[[ voting.question.desc ]] - [[voting.end_date]]</h2>
                 <b-form-group v-for="opt in voting.question.options" :key="opt.number">
                     <b-form-radio v-model="selected"
                                   :id="'q' + opt.number"

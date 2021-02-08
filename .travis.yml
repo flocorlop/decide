@@ -1,21 +1,42 @@
 dist: xenial
-
 services:
-  - postgresql
+- postgresql
 addons:
-  postgresql: "9.4"
+  postgresql: '9.4'
 before_script:
-  - psql -U postgres -c "create user decide2 password 'decide'"
-  - psql -U postgres -c "create database decidedb owner decide2"
-  - psql -U postgres -c "ALTER USER decide2 CREATEDB"
+- psql -U postgres -c "create user decide password 'decide'"
+- psql -U postgres -c "create database decidedb owner decide"
+- psql -U postgres -c "ALTER USER decide CREATEDB"
 language: python
 python:
-  - "3.6"
+- '3.6'
 install:
-  - pip install -r requirements.txt
-  - pip install codacy-coverage
+- pip install -r requirements.txt
+- pip install codacy-coverage
 script:
-  - cd decide
-  - coverage run --branch --source=. ./manage.py test --keepdb --with-xunit
-  - coverage xml
-  - python-codacy-coverage -r coverage.xml
+- wget https://github.com/mozilla/geckodriver/releases/download/v0.27.0/geckodriver-v0.27.0-linux64.tar.gz
+- tar -xzf geckodriver-v0.27.0-linux64.tar.gz
+- chmod +x geckodriver 
+- sudo cp geckodriver /usr/bin/
+- rm geckodriver-v0.27.0-linux64.tar.gz
+- sudo chmod 755 chromedriver
+- sudo mv chromedriver /usr/local/bin
+- wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+- sudo sh -c 'echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google-chrome.list'
+- sudo apt update
+- sudo apt install google-chrome-stable
+- cd decide
+- cp travis_local_settings.py local_settings.py
+
+- coverage run --branch --source=. ./manage.py test authentication --keepdb
+- coverage run --branch --source=. ./manage.py test visualizer --keepdb
+- coverage run --branch --source=. ./manage.py test voting --keepdb
+
+- coverage xml
+- python-codacy-coverage -r coverage.xml
+deploy:
+  provider: heroku
+  app: picaro-decide
+  strategy: git
+  api_key:
+    secure: WMSJx2u4rO6cEvOA6jf9Dr5UVGFs0i6ENiX2Fy+/iO01PpKCCPOF0jibwpbzJSDJEB+ba99+qe0GuF3WdhvYE56ZTXE3RafWDz+EPrGgF9glHNmk3CLFNAkcADFTF2ply5h0LBoLpPTbgTB2Smkak1JXIpD/0Mfy+KLRooFcYqHCN7NteE8aErNzVjDzfCY3Rv/Mj/I0dEfb4A6jcrcv4iKRwcw5SwNORr+Ucq8uT6MVfh7kv3arTc2IxXWNSW2SeZ/sMKThunqNUgxT+gKtaKv8yWhF8GO7rQeZbTNC55w3ofaTmy8ftJBBgh/wiZBdJKJiBidqypuYLz4asOaly7SNiyTNdyKgJV69Lqdd+QzrLr/vvvz3+7yyVnGR0dNgfiRxDg+i48MaJV8WgbCQ/yrNVup/Vfs9delS5SAyZlt0k6k1IhAuTWRntxg6NRtYB1a5p1kF2WIu0cWJCoO6gsCwH3oFB5NzrH+vRLZGtFoNma39Z2LDwuSb2S78GMzy5RKXxiolIXz8Yo2Nld1kDdt7axTw7KiKuAFdGs8bebfZt/0ZcSGt/QH55AQJOxQIfX3+05apxyZ69d4E81FDB37oSpmcN2BLsqUIkdPg7DJTBrIRznP/ZBhPMDBbhpqjA2CbTVrPAdpGz38sv5uz+clO1p8QdYOO6KeNBXvsXvc=
