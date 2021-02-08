@@ -109,7 +109,7 @@ MODULES = [
     'voting',
 ]
 
-BASEURL = 'https://picaro-decide.herokuapp.com'
+BASEURL = 'https://egc-flocorlop-decide.herokuapp.com'
 
 APIS = {
     'authentication': BASEURL ,
